@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Chat_Application</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+    <style>
+      .message-list {
+        height: 500px;
+        overflow: scroll;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" style="background-image:url('color.png')">
+      <div class="row">
+        <div class="col-lg-12 text-center">
+          <h1 class="text-bold mt-5">Chat Application</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12 message-list">
+          <ul class="list-group" id="messagelist"></ul>
+        </div>
+        <div class="col-lg-12">
+          <form onsubmit="sendMessage();return false;">
+            <div class="row mb-5">
+              <div class="col-lg-3">
+                <div class="form-group">
+                  <input
+                    type="text"
+                    id="username"
+                    class="form-control"
+                    placeholder="Name"
+                  />
+                </div>
+              </div>
+              <div class="col-lg-8">
+                <div class="form-group">
+                  <input
+                    type="text"
+                    id="usermessage"
+                    class="form-control"
+                    placeholder="Message"
+                  />
+                </div>
+              </div>
+              <div class="col-lg-1">
+                <input type="submit" class="btn btn-success" value="Send">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="https://mynodejs-chat.herokuapp.com/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io("https://mynodejs-chat.herokuapp.com");
+      socket.on("connect", function() {
+        console.log(socket);
+      });
+
+      function sendMessage() {
+        socket.emit(
+          "newMessage",
+          {
+            username: document.getElementById("username").value,
+            usermessage: document.getElementById("usermessage").value
+          },
+          function(confirmation) {
+            document.getElementById(
+              "messagelist"
+            ).innerHTML += `<li class="list-group-item"><span class='badge badge-primary'>${
+              confirmation.username
+            }</span> : ${confirmation.usermessage}</li>`;
+            document.getElementById("username").value = "";
+            document.getElementById("usermessage").value = "";
+          }
+        );
+      }
+
+      socket.on("reciveMessage", function(message) {
+        document.getElementById(
+          "messagelist"
+        ).innerHTML += `<li class="list-group-item"><span class='badge badge-primary'>${
+          message.username
+        }</span> : ${message.usermessage}</li>`;
+      });
+    </script>
+  </body>
+</html>
